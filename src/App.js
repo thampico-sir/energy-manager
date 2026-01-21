@@ -186,7 +186,7 @@ const AltFuelsProgramManager = () => {
   const exportCSV = () => {
     // Get ALL items for all projects (ignore filters)
     const allItems = getAllItems();
-    const headers = ['Project', 'Group', 'Fuel Type', 'Stage', 'Area', 'Deliverable', 'Owner', 'Start Date', 'End Date', 'Status', 'Comments'];
+    const headers = ['Project', 'Group', 'Fuel Type', 'Stage', 'Area', 'Deliverable', 'Owner', 'Start Date', 'End Date', 'Status', 'Completed', 'Comments'];
     const escape = (str) => `"${String(str || '').replace(/"/g, '""')}"`;
     const csv = [headers.join(','), ...allItems.map(i => [
       escape(i.projectName), 
@@ -198,7 +198,8 @@ const AltFuelsProgramManager = () => {
       escape(i.owner), 
       i.startDate || '',
       i.endDate || '',
-      escape(i.status), 
+      escape(i.status === 'DONE' ? 'Completed' : i.status === 'IN_PROGRESS' ? 'In Process' : 'Not Started'),
+      i.status === 'DONE' ? 'Yes' : 'No',
       escape(i.comments)
     ].join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -428,18 +429,23 @@ const AltFuelsProgramManager = () => {
                                                   <div><label className="block text-xs font-medium mb-1">End Date</label><input type="date" value={details.endDate || ''} onChange={(e) => dispatch({ type: 'DELIVERABLE_UPDATE', payload: { projectId: selectedProject.id, deliverableId: delivId, updates: { endDate: e.target.value } } })} className="w-full px-2 py-1 text-sm border rounded" /></div>
                                                 </div>
                                                 
-                                                <div><label className="flex items-center gap-2"><input type="checkbox" checked={details.status === 'IN_PROGRESS'} onChange={(e) => dispatch({ type: 'DELIVERABLE_UPDATE', payload: { projectId: selectedProject.id, deliverableId: delivId, updates: { status: e.target.checked ? 'IN_PROGRESS' : 'NOT_STARTED' } } })} /><span className="text-sm">In Process</span></label></div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                  <div><label className="flex items-center gap-2"><input type="checkbox" checked={details.status === 'IN_PROGRESS'} onChange={(e) => dispatch({ type: 'DELIVERABLE_UPDATE', payload: { projectId: selectedProject.id, deliverableId: delivId, updates: { status: e.target.checked ? 'IN_PROGRESS' : 'NOT_STARTED' } } })} /><span className="text-sm">In Process</span></label></div>
+                                                  <div><label className="flex items-center gap-2"><input type="checkbox" checked={details.status === 'DONE'} onChange={(e) => dispatch({ type: 'DELIVERABLE_UPDATE', payload: { projectId: selectedProject.id, deliverableId: delivId, updates: { status: e.target.checked ? 'DONE' : 'NOT_STARTED' } } })} /><span className="text-sm">Completed</span></label></div>
+                                                </div>
+                                                
                                                 <div><label className="block text-xs font-medium mb-1">Comments</label><textarea value={details.comments || ''} onChange={(e) => dispatch({ type: 'DELIVERABLE_UPDATE', payload: { projectId: selectedProject.id, deliverableId: delivId, updates: { comments: e.target.value } } })} rows={2} className="w-full px-2 py-1 text-sm border rounded resize-none" /></div>
                                               </div>
                                             )}
 
-                                            {!isEditing && (details.owner || details.startDate || details.endDate || details.status === 'IN_PROGRESS' || details.comments) && (
+                                            {!isEditing && (details.owner || details.startDate || details.endDate || details.status === 'IN_PROGRESS' || details.status === 'DONE' || details.comments) && (
                                               <div className="mt-2 pl-6 text-xs text-slate-600 space-y-1">
                                                 {details.owner && <div><span className="font-medium">Owner:</span> {details.owner}</div>}
                                                 {(details.startDate || details.endDate) && (
                                                   <div><span className="font-medium">Dates:</span> {details.startDate || 'N/A'} to {details.endDate || 'N/A'}</div>
                                                 )}
                                                 {details.status === 'IN_PROGRESS' && <div className="text-orange-600 font-medium">⚡ In Process</div>}
+                                                {details.status === 'DONE' && <div className="text-green-600 font-medium">✓ Completed</div>}
                                                 {details.comments && <div><span className="font-medium">Comments:</span> {details.comments}</div>}
                                               </div>
                                             )}

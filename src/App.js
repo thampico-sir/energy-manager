@@ -272,7 +272,7 @@ const AltFuelsProgramManager = () => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2">Renewable Energy Program Manager v2.0</h1>
+              <h1 className="text-3xl font-bold text-slate-800 mb-2">Renewable Energy Program Manager</h1>
               <p className="text-slate-600">Checklist for Portfolio Management</p>
             </div>
             <div className="flex gap-2 flex-wrap">
